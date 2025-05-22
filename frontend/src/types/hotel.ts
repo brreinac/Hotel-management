@@ -1,14 +1,21 @@
+export interface City {
+  id: number
+  name: string
+}
+
+export interface RoomAssignment {
+  id: number
+  quantity: number
+  room_type: { id: number; name: string; code: string }
+  accommodation: { id: number; name: string; code: string }
+}
+
 export interface Hotel {
-  id: number;
-  name: string;
-  nit: string;
-  address: string;
-  city: { id: number; name: string };
-  max_rooms: number;
-  rooms?: Array<{
-    id: number;
-    room_type: { id: number; name: string };
-    accommodation: { id: number; name: string };
-    quantity: number;
-  }>;
+  id: number
+  name: string
+  nit: string
+  address: string
+  city: City
+  max_rooms: number
+  rooms?: RoomAssignment[]
 }

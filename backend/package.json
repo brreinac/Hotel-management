@@ -4,7 +4,8 @@
     "scripts": {
         "dev": "vite",
         "build": "vite build",
-        "test": "jest"
+        "test": "jest",
+        "test:watch": "jest --watch"
     },
     "devDependencies": {
         "axios": "^1.6.4",

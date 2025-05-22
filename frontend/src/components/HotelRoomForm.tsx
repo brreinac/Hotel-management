@@ -33,7 +33,7 @@ const schema = yup.object({
       'Excede el máximo de habitaciones',
       function (value) {
         const { max_rooms, rooms } = this.options.context as Hotel
-        const used = rooms?.reduce((sum, r) => sum + r.quantity, 0) ?? 0
+        const used = rooms?.reduce((s, r) => s + r.quantity, 0) ?? 0
         return (used + (value ?? 0)) <= max_rooms
       }
     ),
@@ -42,7 +42,6 @@ const schema = yup.object({
 const fetcher = (url: string) => api.get(url).then(r => r.data)
 
 export default function HotelRoomForm({ hotel, onAssigned }: Props) {
-  // Datos de catálogo
   const { data: types } = useSWR('/room_types', fetcher)
   const { data: accs }  = useSWR('/accommodations', fetcher)
 
@@ -56,7 +55,6 @@ export default function HotelRoomForm({ hotel, onAssigned }: Props) {
     resolver: yupResolver(schema, { context: hotel }),
   })
 
-  // Para filtrar acomodaciones según tipo
   const selectedTypeId = watch('room_type_id')
   const allowedMapping: Record<string, string[]> = {
     EST: ['SEN', 'DOB'],
@@ -64,7 +62,6 @@ export default function HotelRoomForm({ hotel, onAssigned }: Props) {
     SUI: ['SEN', 'DOB', 'TRI'],
   }
 
-  // Construir map de códigos
   const typeMap: Record<number, string> = {}
   types?.forEach((t: any) => { typeMap[t.id] = t.code })
 
@@ -73,75 +70,51 @@ export default function HotelRoomForm({ hotel, onAssigned }: Props) {
     return allowedMapping[typeCode]?.includes(a.code)
   }) ?? []
 
+  useEffect(() => {
+    reset({ ...watch(), accommodation_id: undefined })
+  }, [selectedTypeId])
+
   const onSubmit = async (data: FormValues) => {
     await api.post(`/hotels/${hotel.id}/rooms`, data)
     reset()
     onAssigned()
   }
 
-  // Resetea al cambio de tipo para evitar acomodación no válida
-  useEffect(() => {
-    reset({ ...watch(), accommodation_id: undefined })
-  }, [selectedTypeId])
-
   if (!types || !accs) return <p>Cargando catálogos…</p>
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="bg-white p-4 rounded shadow space-y-4"
-    >
+    <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-4 rounded shadow space-y-4">
       <h2 className="text-xl font-semibold">Asignar habitación</h2>
 
       <div>
-        <label className="block mb-1">Tipo de habitación</label>
-        <select
-          {...register('room_type_id')}
-          className="w-full border p-2 rounded"
-        >
+        <label>Tipo de habitación</label>
+        <select {...register('room_type_id')} className="w-full border p-2 rounded">
           <option value="">— Seleccione —</option>
           {types.map((t: any) => (
             <option key={t.id} value={t.id}>{t.name}</option>
           ))}
         </select>
-        {errors.room_type_id && (
-          <p className="text-red-500 mt-1">{errors.room_type_id.message}</p>
-        )}
+        {errors.room_type_id && <p className="text-red-500">{errors.room_type_id.message}</p>}
       </div>
 
       <div>
-        <label className="block mb-1">Acomodación</label>
-        <select
-          {...register('accommodation_id')}
-          className="w-full border p-2 rounded"
-        >
+        <label>Acomodación</label>
+        <select {...register('accommodation_id')} className="w-full border p-2 rounded">
           <option value="">— Seleccione —</option>
           {filteredAccs.map((a: any) => (
             <option key={a.id} value={a.id}>{a.name}</option>
           ))}
         </select>
-        {errors.accommodation_id && (
-          <p className="text-red-500 mt-1">{errors.accommodation_id.message}</p>
-        )}
+        {errors.accommodation_id && <p className="text-red-500">{errors.accommodation_id.message}</p>}
       </div>
 
       <div>
-        <label className="block mb-1">Cantidad</label>
-        <input
-          type="number"
-          {...register('quantity')}
-          className="w-full border p-2 rounded"
-        />
-        {errors.quantity && (
-          <p className="text-red-500 mt-1">{errors.quantity.message}</p>
-        )}
+        <label>Cantidad</label>
+        <input type="number" {...register('quantity')} className="w-full border p-2 rounded" />
+        {errors.quantity && <p className="text-red-500">{errors.quantity.message}</p>}
       </div>
 
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
-      >
+      <button type="submit" disabled={isSubmitting} className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50">
         {isSubmitting ? 'Asignando...' : 'Asignar'}
       </button>
     </form>
