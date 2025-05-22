@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -12,15 +11,10 @@ class HotelRoomController extends Controller
     public function store(StoreHotelRoomRequest $request, Hotel $hotel)
     {
         $data = $request->validated();
-
-        // Validar límite de habitaciones
-        $existingTotal = $hotel->rooms()->sum('quantity');
-        if ($existingTotal + $data['quantity'] > $hotel->max_rooms) {
-            return response()->json([
-                'message' => 'La cantidad solicitada excede el límite de habitaciones del hotel'
-            ], 422);
+        $total = $hotel->rooms()->sum('quantity') + $data['quantity'];
+        if ($total > $hotel->max_rooms) {
+            return response()->json(['message'=>'Excede el máximo'], 422);
         }
-
         $room = $hotel->rooms()->create($data);
         return response()->json($room, 201);
     }

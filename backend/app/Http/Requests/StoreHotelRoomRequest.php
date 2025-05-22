@@ -1,16 +1,11 @@
 <?php
-
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreHotelRoomRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
-        return true;  // <-- Habilita la petición
-    }
-
+    public function authorize() { return true; }
     public function rules(): array
     {
         return [
