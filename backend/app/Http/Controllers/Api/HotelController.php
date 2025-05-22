@@ -4,35 +4,42 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreHotelRequest;
 use App\Http\Requests\UpdateHotelRequest;
+use App\Repositories\Contracts\HotelRepositoryInterface;
 use App\Models\Hotel;
+use Illuminate\Http\JsonResponse;
 
 class HotelController extends Controller
 {
-    public function index()
+    public function __construct(
+        protected HotelRepositoryInterface $hotels
+    ) {}
+
+    public function index(): JsonResponse
     {
-        return Hotel::with('city')->get();
+        return response()->json($this->hotels->all());
     }
 
-    public function store(StoreHotelRequest $request)
+    public function store(StoreHotelRequest $request): JsonResponse
     {
-        $hotel = Hotel::create($request->validated());
+        $hotel = $this->hotels->create($request->validated());
         return response()->json($hotel, 201);
     }
 
-    public function show(Hotel $hotel)
+    public function show(Hotel $hotel): JsonResponse
     {
-        return $hotel->load(['city', 'rooms.roomType', 'rooms.accommodation']);
+        $found = $this->hotels->find($hotel->id);
+        return response()->json($found);
     }
 
-    public function update(UpdateHotelRequest $request, Hotel $hotel)
+    public function update(UpdateHotelRequest $request, Hotel $hotel): JsonResponse
     {
-        $hotel->update($request->validated());
-        return response()->json($hotel);
+        $updated = $this->hotels->update($hotel, $request->validated());
+        return response()->json($updated);
     }
 
-    public function destroy(Hotel $hotel)
+    public function destroy(Hotel $hotel): JsonResponse
     {
-        $hotel->delete();
+        $this->hotels->delete($hotel);
         return response()->noContent();
     }
 }
