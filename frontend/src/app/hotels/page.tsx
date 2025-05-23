@@ -4,6 +4,7 @@ import Spinner from '@/components/Spinner'
 import ErrorMessage from '@/components/ErrorMessage'
 import HotelCard from '@/components/HotelCard'
 import { Hotel } from '@/types/hotel'
+import Catalogs from '@/components/Catalogs'
 
 export default function HotelsPage() {
   const { data: hotels, error, isLoading } = useFetch<Hotel[]>('/hotels')

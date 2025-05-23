@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateHotelRequest;
 use App\Repositories\Contracts\HotelRepositoryInterface;
 use App\Models\Hotel;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Database\QueryException;
 
 class HotelController extends Controller
 {
@@ -21,10 +22,18 @@ class HotelController extends Controller
 
     public function store(StoreHotelRequest $request): JsonResponse
     {
-        $hotel = $this->hotels->create($request->validated());
-        return response()->json($hotel, 201);
+        try {
+            $hotel = $this->hotels->create($request->validated());
+            return response()->json($hotel, 201);
+        } catch (QueryException $e) {
+            if ($e->getCode() === '23505') { // unique_violation en PostgreSQL
+                return response()->json([
+                    'message' => 'Ya existe un hotel con ese NIT'
+                ], 422);
+            }
+            throw $e;
+        }
     }
-
     public function show(Hotel $hotel): JsonResponse
     {
         $found = $this->hotels->find($hotel->id);

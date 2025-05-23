@@ -49,7 +49,7 @@ class HotelTest extends TestCase
 
         // Segundo intento: debería fallar validación de NIT único
         $this->postJson('/api/hotels', $data)
-             ->assertStatus(422)
-             ->assertJsonValidationErrors('nit');
+            ->assertStatus(422)
+            ->assertJsonFragment(['message' => 'Ya existe un hotel con ese NIT']);
     }
 }

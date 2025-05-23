@@ -9,6 +9,7 @@ class Hotel extends Model
 {
     use HasFactory;
 
+    // <-- Agrega esta propiedad
     protected $fillable = [
         'name',
         'nit',
@@ -17,6 +18,7 @@ class Hotel extends Model
         'max_rooms',
     ];
 
+    // Relaciones
     public function city()
     {
         return $this->belongsTo(City::class);
