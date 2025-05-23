@@ -1,25 +1,19 @@
 <?php
-
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class CitiesTableSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run()
     {
-        $cities = ['BogotÃ¡', 'MedellÃ­n', 'Cali'];
+        $cities = ['Bogotá', 'Medellín', 'Cali', 'Cartagena'];
         foreach ($cities as $city) {
-            DB::table('cities')->insert([
-                'name' => $city,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            DB::table('cities')->updateOrInsert(
+                ['name' => $city],
+                ['created_at' => now(), 'updated_at' => now()]
+            );
         }
     }
 }

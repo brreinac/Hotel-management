@@ -1,31 +1,24 @@
 <?php
-
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 class AccommodationsTableSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run()
     {
-        $accommodations = [
+        $accs = [
             ['code' => 'SEN', 'name' => 'Sencilla'],
             ['code' => 'DOB', 'name' => 'Doble'],
             ['code' => 'TRI', 'name' => 'Triple'],
-            ['code' => 'CUA', 'name' => 'CuÃ¡druple'],
+            ['code' => 'CUA', 'name' => 'Cuádruple'],
         ];
-        foreach ($accommodations as $acc) {
-            DB::table('accommodations')->insert([
-                'code' => $acc['code'],
-                'name' => $acc['name'],
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+        foreach ($accs as $a) {
+            DB::table('accommodations')->updateOrInsert(
+                ['code' => $a['code']],
+                ['name' => $a['name'], 'created_at' => now(), 'updated_at' => now()]
+            );
         }
     }
 }
